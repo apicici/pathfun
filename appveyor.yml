@@ -1,0 +1,17 @@
+platform: x64
+skip_non_tags: true
+clone_depth: 1
+
+image: Ubuntu
+
+build_script:
+  - bash .appveyor/build.sh
+
+after_build:
+  - appveyor PushArtifact build.zip -FileName ${APPVEYOR_PROJECT_SLUG}-${APPVEYOR_REPO_TAG_NAME}.zip
+
+deploy:
+  - provider: GitHub
+    auth_token:
+      secure: 0DXlYfppH/jHL2wWQ/JTPYcjZxhFW+cA4QbaqBb3UCj9LU77ybORNlVtgP2JFidl
+    draft: true
