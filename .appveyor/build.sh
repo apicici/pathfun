@@ -10,5 +10,6 @@ mkdir -p pathfun
 cd src && moonc -t ../pathfun .
 cd ..
 zip -r build.zip pathfun
+zip -r build.zip docs
 zip -j build.zip *.md
 zip -j build.zip .appveyor/*.md
