@@ -12,4 +12,5 @@ cd ..
 zip -r build.zip pathfun
 zip -r build.zip docs
 zip -j build.zip *.md
+zip -j build.zip example.gif
 zip -j build.zip .appveyor/*.md
