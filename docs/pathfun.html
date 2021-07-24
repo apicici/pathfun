@@ -1,0 +1,388 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Navigation &mdash; pathfun 2021 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="pathfun" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pathfun
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Navigation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#initialisation">Initialisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#methods">Methods</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pathfun</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Navigation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="navigation">
+<h1>Navigation<a class="headerlink" href="#navigation" title="Permalink to this headline">¶</a></h1>
+<p><img alt="docs: complete" src="https://img.shields.io/badge/docs-complete-success" /></p>
+<p>A class to handle pathfinding on a region specified by a list of polygonal meshes.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="kd">local</span> <span class="n">pathfun</span> <span class="o">=</span> <span class="nb">require</span> <span class="s2">&quot;pathfun&quot;</span>
+
+<span class="c1">-- In this example the first polygon map describes two disjoint polygons, while the</span>
+<span class="c1">-- second one is a (currently hidden) bridge between them.</span>
+<span class="kd">local</span> <span class="n">polygon_maps</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">{</span>
+        <span class="p">{{</span><span class="mi">520</span><span class="p">,</span><span class="mi">441</span><span class="p">},{</span><span class="mi">456</span><span class="p">,</span><span class="mi">429</span><span class="p">},{</span><span class="mi">454</span><span class="p">,</span><span class="mi">342</span><span class="p">},{</span><span class="mi">658</span><span class="p">,</span><span class="mi">370</span><span class="p">},{</span><span class="mi">666</span><span class="p">,</span><span class="mi">436</span><span class="p">}},</span>
+        <span class="p">{{</span><span class="mi">520</span><span class="p">,</span><span class="mi">441</span><span class="p">},{</span><span class="mi">666</span><span class="p">,</span><span class="mi">436</span><span class="p">},{</span><span class="mi">549</span><span class="p">,</span><span class="mi">498</span><span class="p">}},</span>
+        <span class="p">{{</span><span class="mi">822</span><span class="p">,</span><span class="mi">391</span><span class="p">},{</span><span class="mi">880</span><span class="p">,</span><span class="mi">372</span><span class="p">},{</span><span class="mi">868</span><span class="p">,</span><span class="mi">446</span><span class="p">},{</span><span class="mi">747</span><span class="p">,</span><span class="mi">431</span><span class="p">}},</span>
+        <span class="p">{{</span><span class="mi">822</span><span class="p">,</span><span class="mi">391</span><span class="p">},{</span><span class="mi">747</span><span class="p">,</span><span class="mi">431</span><span class="p">},{</span><span class="mi">754</span><span class="p">,</span><span class="mi">360</span><span class="p">},{</span><span class="mi">796</span><span class="p">,</span><span class="mi">346</span><span class="p">}}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="p">{{</span><span class="mi">747</span><span class="p">,</span><span class="mi">431</span><span class="p">},{</span><span class="mi">666</span><span class="p">,</span><span class="mi">436</span><span class="p">},{</span><span class="mi">658</span><span class="p">,</span><span class="mi">370</span><span class="p">},{</span><span class="mi">754</span><span class="p">,</span><span class="mi">360</span><span class="p">}},</span>
+        <span class="n">hidden</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;bridge&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">local</span> <span class="n">navigation</span> <span class="o">=</span> <span class="n">pathfun</span><span class="p">.</span><span class="n">Navigation</span><span class="p">(</span><span class="n">polygon_maps</span><span class="p">)</span>
+
+<span class="c1">-- optional, only needed if to force initialisation right now</span>
+<span class="n">navigation</span><span class="p">:</span><span class="n">initialize</span><span class="p">()</span>
+
+<span class="c1">-- returns false since the point is in the hidden polygon map</span>
+<span class="n">navigation</span><span class="p">:</span><span class="n">is_point_inside</span><span class="p">(</span><span class="mi">706</span><span class="p">,</span> <span class="mi">401</span><span class="p">)</span>
+
+<span class="c1">-- returns {{564,467}, {665,436}} since the bridge is hidden</span>
+<span class="n">navigation</span><span class="p">:</span><span class="n">shortest_path</span><span class="p">(</span><span class="mi">564</span><span class="p">,</span> <span class="mi">467</span><span class="p">,</span> <span class="mi">856</span><span class="p">,</span> <span class="mi">437</span><span class="p">)</span>
+
+<span class="c1">-- make the bridge visible</span>
+<span class="n">navigation</span><span class="p">:</span><span class="n">toggle_visibility</span><span class="p">(</span><span class="s2">&quot;bridge&quot;</span><span class="p">)</span>
+
+<span class="c1">-- now returns true</span>
+<span class="n">navigation</span><span class="p">:</span><span class="n">is_point_inside</span><span class="p">(</span><span class="mi">706</span><span class="p">,</span> <span class="mi">401</span><span class="p">)</span>
+
+<span class="c1">-- returns {{564,467}, {665,436}, {747, 431}, {856, 437}}</span>
+<span class="n">navigation</span><span class="p">:</span><span class="n">shortest_path</span><span class="p">(</span><span class="mi">564</span><span class="p">,</span> <span class="mi">467</span><span class="p">,</span> <span class="mi">856</span><span class="p">,</span> <span class="mi">437</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="initialisation">
+<h2>Initialisation<a class="headerlink" href="#initialisation" title="Permalink to this headline">¶</a></h2>
+<dl class="lua function">
+<dt id="pathfun.Navigation">
+<em class="property"> </em><code class="sig-prename descclassname"><span class="pre">pathfun.</span></code><code class="sig-name descname"><span class="pre">Navigation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pmaps</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pathfun.Navigation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new <a class="reference internal" href="#Navigation" title="Navigation"><code class="xref lua lua-class docutils literal notranslate"><span class="pre">Navigation</span></code></a> object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pmaps</strong> (<em>table</em>) – a table representing a list of polygon maps. Each polygon map is itself a table
+of <em>convex</em> polygons (represented by a list of pairs of coordinates), with optional fields <code class="docutils literal notranslate"><span class="pre">name</span></code>
+(a string) and <code class="docutils literal notranslate"><span class="pre">hidden</span></code> (a boolean).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#Navigation" title="Navigation"><code class="xref lua lua-class docutils literal notranslate"><span class="pre">Navigation</span></code></a> object.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul>
+<li><p>Separate polygon maps can be used to dynamically change the navigation area by hiding/unhiding them to create/remove an obstacle.
+If this feature is not needed a single polygon map is enough to describe the navigation area, even if it consists
+of disjoint pieces and/or has holes.</p></li>
+<li><p>Only named polygon maps can by hidden. The <code class="docutils literal notranslate"><span class="pre">hidden</span></code> field is ignored if a name is not provided.</p></li>
+<li><p>A the region described by a single polygon map is obtained by taking the union of the convex polygons it contains.
+Note however that the library assumes that the polygons provide a convex decomposition of the area, so there should
+be no overlaps. The intersection between two polygons can only be:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>empty</p></li>
+<li><p>an edge shared by the two polygons (in which case the polygons are considered connected)</p></li>
+<li><p>a vertex point</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>The same conditions as above apply to the overlap of multiple polygon maps.</p></li>
+</ul>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<dl class="lua class">
+<dt id="Navigation">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Navigation</span></code><a class="headerlink" href="#Navigation" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="lua method">
+<dt id="Navigation.initialize">
+<em class="property"> </em><code class="sig-name descname"><span class="pre">initialize</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Navigation.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populates the information about the connections between the various polygons in the polygon maps.
+This method is called automatically the first time the <code class="docutils literal notranslate"><span class="pre">is_point_inside</span></code>, <code class="docutils literal notranslate"><span class="pre">closest_boundary_point</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">shortest_path</span></code> methods are called, so it’s not necessary to call it explicitly. You can call it to
+force the initialisation to happen at a specified time instead.</p>
+</dd></dl>
+
+<dl class="lua method">
+<dt id="Navigation.toggle_visibility">
+<em class="property"> </em><code class="sig-name descname"><span class="pre">toggle_visibility</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Navigation.toggle_visibility" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggles the visibility status of the polygon map with name <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>string</em>) – the name of the polygon map.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="lua method">
+<dt id="Navigation.set_visibility">
+<em class="property"> </em><code class="sig-name descname"><span class="pre">set_visibility</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name</span></em>, <em class="sig-param"><span class="pre">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Navigation.set_visibility" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the visibility status of the polygon map with name <code class="docutils literal notranslate"><span class="pre">name</span></code> to <code class="docutils literal notranslate"><span class="pre">value</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>string</em>) – the name of the polygon map.</p></li>
+<li><p><strong>value</strong> (<em>boolean</em>) – the new visibility value.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="lua method">
+<dt id="Navigation.is_point_inside">
+<em class="property"> </em><code class="sig-name descname"><span class="pre">is_point_inside</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">x</span></em>, <em class="sig-param"><span class="pre">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Navigation.is_point_inside" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether the point <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> is inside the visible navigation area.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x, y</strong> (<em>numbers</em>) – coordinates of the point. They must be integers to ensure the result is correct.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>boolean</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="lua method">
+<dt id="Navigation.closest_boundary_point">
+<em class="property"> </em><code class="sig-name descname"><span class="pre">closest_boundary_point</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">x</span></em>, <em class="sig-param"><span class="pre">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Navigation.closest_boundary_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the point on the boundary of the visible navigation area which is closest to a given point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x, y</strong> (<em>numbers</em>) – coordinates of the point.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the coordinates of the closest boundary point, as two separate outputs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="lua method">
+<dt id="Navigation.shortest_path">
+<em class="property"> </em><code class="sig-name descname"><span class="pre">shortest_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">x1</span></em>, <em class="sig-param"><span class="pre">y1</span></em>, <em class="sig-param"><span class="pre">x2</span></em>, <em class="sig-param"><span class="pre">y2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Navigation.shortest_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the shortest path between <code class="docutils literal notranslate"><span class="pre">(x1,</span> <span class="pre">y1)</span></code> and <code class="docutils literal notranslate"><span class="pre">(x2,</span> <span class="pre">y2)</span></code> within the visible navigation area.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x1, y1</strong> (<em>numbers</em>) – coordinates of the starting point. Automatically rounded to integer coordinates.</p></li>
+<li><p><strong>x2, y2</strong> (<em>numbers</em>) – coordinates of the target point. Automatically rounded to integer coordinates.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A table of coordinates of the form <code class="docutils literal notranslate"><span class="pre">{x,</span> <span class="pre">y}</span></code>, representing the vertices of the piece-wise path. The (rounded) starting and target point are included in the list.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>If the starting point is outside of the visible navigation area it is replaced
+with the closest boundary point.</p></li>
+<li><p>If the target point is unreachable from the starting point (either because it is outside of the
+navigation area or because it is in a disconnected region) it is replaced with the closest boundary point
+<em>whithin the region connected to the starting point</em>, i.e. the reachable point which is closest to the target point.</p></li>
+</ul>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="index.html" class="btn btn-neutral float-left" title="pathfun" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, apicici.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
