@@ -1,15 +1,17 @@
 path = (...)\gsub("[^%.]*$", "")
-M = require(path .. 'master')
+Class = require(path .. 'class')
+
+import sqrt from math
 
 local Vec2
-Vec2 = M.class {
-    __init: (x=0, y=0) => self.x, self.y = x, y
+Vec2 = Class {
+    __init: (x, y) =>
+        @x = x or 0
+        @y = y or 0
 
-    __add: (u, v) -> 
-        Vec2(u.x + v.x, u.y + v.y)
+    __add: (u, v) -> Vec2(u.x + v.x, u.y + v.y)
 
-    __sub: (u, v) ->
-        Vec2(u.x - v.x, u.y - v.y)
+    __sub: (u, v) -> Vec2(u.x - v.x, u.y - v.y)
 
     __unm: => Vec2(-self.x, -self.y)
 
@@ -20,7 +22,7 @@ Vec2 = M.class {
             Vec2(b*a.x, b*a.y)
         else error("attempt to multiply a vector with a non-scalar value", 2)
 
-    __div: (a) => @@(self.x/a, self.y/a)
+    __div: (a) => Vec2(self.x/a, self.y/a)
 
     __eq: (u, v) -> u.x == v.x and u.y == v.y
 
@@ -36,8 +38,9 @@ Vec2 = M.class {
     lenS: (v) -> 
         Vec2.dot(v, v)
 
-    len: => math.sqrt(self\lenS())
+    len: => sqrt(@lenS())
 
-    unpack: => self.x, self.y
+    unpack: => @x, @y
 }
-M.Vec2 = Vec2
+
+return Vec2

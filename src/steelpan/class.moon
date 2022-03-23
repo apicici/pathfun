@@ -1,6 +1,3 @@
-path = (...)\gsub("[^%.]*$", "")
-M = require(path .. 'master')
-
 excluded_keys = {
 	'__init': true
 	'__extends': true
@@ -8,7 +5,7 @@ excluded_keys = {
 	'__class': true
 }
 
-M.class = (tbl) ->
+Class = (tbl) ->
 	assert(type(tbl) == 'table', "An initialisation table must be provided for the class")
 
 	parent = tbl.__extends
@@ -28,7 +25,8 @@ M.class = (tbl) ->
 	base.__index = if __index = c.__index
 		(t, key) ->
 			olditem = base[key]
-			unless olditem == nil return olditem
+			unless olditem == nil
+				return olditem
 
 			item = switch type(__index)
 				when "table" then __index[key]
@@ -38,7 +36,7 @@ M.class = (tbl) ->
 		base
 
 	setmetatable(c, {
-		__call: ( ...) =>
+		__call: (...) =>
 			__newindex = base.__newindex
 			base.__newindex = nil
 			obj = setmetatable({}, base)
@@ -48,3 +46,5 @@ M.class = (tbl) ->
 			
 		__index: base
 	})
+
+return Class

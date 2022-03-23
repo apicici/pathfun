@@ -1,9 +1,11 @@
 path = (...)\gsub("[^%.]*$", "")
-M = require(path .. 'master')
+CyclicList = require path .. 'cyclic'
+Vec2 = require path .. 'vectors'
+utils = require path .. 'utils'
 
-import CyclicList, Vec2 from M
 import dot, wedge from Vec2
-import clamp, sgn from M.math
+import clamp, sgn from utils.math
+import min, max, abs, huge from math
 
 geometry = {}
 
@@ -15,12 +17,12 @@ geometry.closest_edge_point = (P, A, B) ->
     return A + t*u
 
 geometry.bounding_box = (points) ->
-	minx, miny, maxx, maxy = math.huge, math.huge, -math.huge, -math.huge
+	minx, miny, maxx, maxy = huge, huge, -huge, -huge
     for v in *points
-        minx = math.min(minx, v.x)
-        miny = math.min(miny, v.y)
-        maxx = math.max(maxx, v.x)
-        maxy = math.max(maxy, v.y)
+        minx = min(minx, v.x)
+        miny = min(miny, v.y)
+        maxx = max(maxx, v.x)
+        maxy = max(maxy, v.y)
     return {x:minx, y:miny}, {x:maxx, y:maxy}
 
 geometry.is_point_in_triangle = (P, A, B, C) ->
@@ -30,7 +32,7 @@ geometry.is_point_in_triangle = (P, A, B, C) ->
     s = sgn(sda)
     a = wedge(P - C, B - C)
     b = wedge(P - C, C - A)
-    return s*a >= 0 and s*b >=0 and s*(a + b) <= math.abs(sda)
+    return s*a >= 0 and s*b >=0 and s*(a + b) <= abs(sda)
 
 geometry.centroid = (points) ->
 	P = CyclicList(points)

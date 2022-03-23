@@ -32,43 +32,44 @@
 ---------------------------------------------------------------------------
 
 
+
 path = (...)\gsub("[^%.]*$", "")
-M = require(path .. 'master')
+M = require(path .. 'main')
 
-import CyclicList, Set, SymmetricMatrix, Vec2 from M
-import wedge from Vec2
-import round from M.math
+import Class, CyclicList, Set, Vec2 from M.steelpan
+import SymmetricMatrix from M.steelpan.matrices
+import bounding_box, centroid, closest_edge_point, is_point_in_triangle from M.steelpan.geometry
+import round, clamp, sgn from M.steelpan.utils.math
+import dot, wedge from Vec2
+import huge from math
 
-geometry = require(path .. 'geometry')
-import bounding_box, centroid, closest_edge_point, is_point_in_triangle from geometry
+unpack = unpack or table.unpack
 
 local *
 
-ConvexPolygon = M.class {
-    __init: (vertices, name, hidden) =>
+ConvexPolygon = Class {
+    __init: (vertices, @name, @hidden) =>
         -- vertices is a list of Vec2
-        assert(#vertices > 2, "A polygon must have a least 3 points.", 2)
+        assert(#vertices > 2, "A polygon must have a least 3 points.")
         @vertices = CyclicList(vertices)
-        @name = name
-        @hidden = hidden
         @n = #vertices
         @min, @max = bounding_box(vertices)
         @centroid = centroid(vertices)
-        @connections = [false for i = 1, @n]
-
-    len: => @n
+        @connections = {}
 
     ipairs: => ipairs(@vertices.items)
 
-    __index: (key) => @vertices[key] 
+    __index: (key) => type(key) == "number" and @vertices[key] or nil
 
     get_edge: (i) => @vertices[i], @vertices[i + 1]
 
     get_connection: (i) =>
-        -- if edge i is connected to another polygon return the polygon + edge_idx it is connected to.
-        c = @connections[i]
-        if c and not c.polygon.hidden 
-            return c.polygon, c.edge
+        -- if edge i is connected to another polygon return the polygon + edge_idx it is connected to
+        -- if connected to multiple polygons return the first non-hidden one
+        if c = @connections[i]
+            for t in *c
+                if not t.polygon.hidden
+                    return t
 
     is_point_inside: (P) =>
         unless P.x < @min.x or P.y < @min.y or P.x > @max.x or P.y > @max.y
@@ -80,11 +81,12 @@ ConvexPolygon = M.class {
         visited[self] = true
         if @is_point_inside(P)
             return self
-        for t in *@connections
-            if t and not t.polygon.hidden and not visited[t.polygon]
-                if poly = t.polygon\is_point_inside_connected(P, visited)
-                    return poly
-        return nil
+        for i = 1, @n
+            if c = @get_connection(i)
+                p = c.polygon
+                if not visited[p]
+                    if poly = p\is_point_inside_connected(P, visited)
+                        return poly
 
     closest_edge_point: (P, edge_idx) =>
         A, B = @get_edge(edge_idx)
@@ -94,33 +96,41 @@ ConvexPolygon = M.class {
         visited[self] = true
 
         local C, poly
-        d = math.huge
+        d = huge
+        -- cycle through edges
         for i = 1, @n
-            if not @connections[i] or @connections[i].polygon.hidden
-                tmp_C = @closest_edge_point(P, i)
-                tmp_d = (P - tmp_C)\lenS()
-                if tmp_d < d
-                    d = tmp_d
-                    C = tmp_C
-                    poly = self
-            else
-                neighbour = @connections[i].polygon
+            local tmp_C, tmp_poly
+            tmp_d = huge
+
+            if neighbour = @get_connection(i)
+                neighbour = neighbour.polygon
                 if not visited[neighbour]
                     tmp_C, tmp_poly, tmp_d = neighbour\closest_boundary_point_connected(P, visited)
-                    if tmp_d < d
-                        d = tmp_d
-                        C = tmp_C
-                        poly = tmp_poly
+            else
+                tmp_poly = self
+                tmp_C = @closest_edge_point(P, i)
+                tmp_d = (P - tmp_C)\lenS()
+
+            if tmp_d < d
+                C, poly, d = tmp_C, tmp_poly, tmp_d
+        
         return C, poly, d
 }
 
 
-Navigation = M.class {
+Navigation = Class {
     __init: (pmaps={}) =>
         -- pmaps is a table of lists of convex decompositions. Each convex decomposition is a list
         -- of convex polygons, represented by a list of pairs of coordinates. Each pmap can optionally have
         -- a "name" field (a string), which will be used to toggle the pmap visibility, and a "hidden" field
         -- (boolean) which will determine if it is initially visible.
+        --
+        -- scaling_regions is a table of convex decomposition. Each scaling region must have a "grad_start"
+        -- and a "grad_end" field (both pairs of coordinates) and a "scale_table" field. The "scale_table"
+        -- field is a list of pairs {a, scale} where "a" is a parameter between 0 and 1 specifying the position
+        -- on the segment with endpoints grad_start and grad_end, while "scale" specifies the scaling percentage
+        -- at that point (betwen 0 and 1). The entries of the scale table should be ordered by the parameter "a"
+        -- and contain at least the a=0 and a=1 entries.
         vertices, vertex_idxs, polygons, name_groups = {}, {n:0}, {}, {}
         for pmap in *pmaps
             name_group = pmap.name and {}
@@ -145,54 +155,53 @@ Navigation = M.class {
         @name_groups = name_groups
 
     set_visibility: (name, bool) =>
-        for p in *(@name_groups[name] or {})
-            p.hidden = not bool
+        if t = @name_groups[name]
+            for p in *t
+                p.hidden = not bool
 
     toggle_visibility: (name) =>
-        for p in *(@name_groups[name] or {})
-            p.hidden = not p.hidden
+        if t = @name_groups[name]
+            for p in *t
+                p.hidden = not p.hidden
 
     initialize: =>
         @initialized = true
         edges_matrix = SymmetricMatrix(@vertex_idxs.n)
-        for k, p in ipairs(@polygons)
+        for p in *@polygons
             for i = 1, p.n
                 A, B = p\get_edge(i)
                 A_idx, B_idx = @vertex_idxs[A], @vertex_idxs[B]
-                if not edges_matrix[A_idx][B_idx]
-                    edges_matrix[A_idx][B_idx] = {}
-                t = edges_matrix[A_idx][B_idx]
+                t = edges_matrix\get(A_idx, B_idx)
+                if not t
+                    t = {}
+                    edges_matrix\set(A_idx, B_idx, t)
                 t[#t + 1] = {edge:i, polygon:p}
 
         for i = 1, @vertex_idxs.n
             for j = i + 1, @vertex_idxs.n
-                if t = edges_matrix[i][j]
-                    A, B = unpack(t)
-                    A.polygon.connections[A.edge] = B or false
-                    B.polygon.connections[B.edge] = A if B
+                if t = edges_matrix\get(i, j)
+                    if #t > 1
+                        for k, c in ipairs(t)
+                            c.polygon.connections[c.edge] = [t[x] for x = 1, #t when x ~= k]
 
     _is_point_inside: (P) =>
         @initialize() if not @initialized
-        visited = {}
         for poly in *@polygons
-            if not visited[poly] and not poly.hidden
-                if p = poly\is_point_inside_connected(P, visited) then return p
+            if not poly.hidden and poly\is_point_inside(P)
+                return poly
 
     _closest_boundary_point: (P) =>
         @initialize() if not @initialized
-        d = math.huge
-        local C, piece, poly
-
+        d = huge
+        local C, poly
         for p in *@polygons
             unless p.hidden
                 for i = 1, p.n
-                    if not p.connections[i] or p.connections[i].polygon.hidden
+                    if not p\get_connection(i)
                         tmp_C = p\closest_edge_point(P, i)
                         tmp_d = (P - tmp_C)\lenS()
                         if tmp_d < d
-                            d = tmp_d
-                            C = tmp_C
-                            poly = p
+                            d, C, poly = tmp_d, tmp_C, p
 
         return C, poly
 
@@ -218,7 +227,9 @@ Navigation = M.class {
             B, node_B = node_A\closest_boundary_point_connected(B)
             B = round(B)
 
-        if node_A == node_B
+        if A == B
+            return {A}
+        elseif node_A == node_B
             return {A, B}
 
         found_path = false
@@ -236,7 +247,7 @@ Navigation = M.class {
             if polylist\size() == 0
                 break
             local least_cost_poly
-            least_cost = math.huge
+            least_cost = huge
 
             for p in polylist\iterator()
                 cost = p ~= node_B and p.distance + (p.centroid - A)\len() or 0
@@ -246,8 +257,8 @@ Navigation = M.class {
 
             p = least_cost_poly
             for i = 1, p.n
-                q, c_edge = p\get_connection(i)
-                if q
+                if t = p\get_connection(i)
+                    q, c_edge = t.polygon, t.edge
                     entry = p\closest_edge_point(p.entry, i)
                     distance = p.distance + (p.entry - entry)\len()
                     if q.prev_edge
@@ -276,21 +287,23 @@ Navigation = M.class {
             sign = orientation(C, L, D)
             sign = sign == 0 and orientation(C, R, D) or sign 
             portals[#portals + 1] = sign > 0 and {C, D} or {D, C}
-            p = p\get_connection(p.prev_edge)
+            if c = p\get_connection(p.prev_edge)
+                p = c.polygon
         portals[#portals + 1] = {B, B}
 
         return string_pull(portals)
-  
+
     is_point_inside: (x, y) =>
         return not not @_is_point_inside(Vec2(x, y))
 
     closest_boundary_point: (x, y) =>
         P = @_closest_boundary_point(Vec2(x, y))
         return P.x, P.y
-    
+
     shortest_path: (x1, y1, x2, y2) =>
         path = @_shortest_path(Vec2(x1, y1), Vec2(x2, y2))
-        return [{v.x, v.y} for v in *path]
+        path = [{v.x, v.y} for v in *path]
+        return path
 }
 M.Navigation = Navigation
 
