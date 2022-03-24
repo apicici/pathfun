@@ -18,11 +18,11 @@
 # -- Project information -----------------------------------------------------
 
 project = 'pathfun'
-copyright = '2021, apicici'
+copyright = '2022, apicici'
 author = 'apicici'
 
 # The full version, including alpha/beta/rc tags
-release = '2021'
+release = '2.0'
 
 
 # -- General configuration ---------------------------------------------------

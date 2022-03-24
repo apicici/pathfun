@@ -81,7 +81,9 @@ Initialisation
             + a vertex point
             
 
-        - The same conditions as above apply to the overlap of multiple polygon maps.
+        - The same conditions as above apply to the overlap of multiple polygon maps. Moreover, the libary expects all vertices
+          to be external vertices. If joining two polygon maps makes one or more of their shared vertices internal the pathfinding
+          algorithm will not behave as expected.
 
 
 Methods
